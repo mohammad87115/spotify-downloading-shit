@@ -27,7 +27,7 @@ jobs:
 
       # Step 4: Install spotifydownload
       - name: Install spotifydownload
-        run: go install github.com/schollz/spotifydownload@latest
+        run: go get github.com/schollz/spotifydownload@latest
         env:
           GOPATH: ${{ runner.temp }}/go
           PATH: ${{ runner.tool_cache }}/go/bin:$PATH:${{ runner.temp }}/go/bin
