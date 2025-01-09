@@ -13,30 +13,26 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      # Step 2: Setup Go environment
-      - name: Setup Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: 1.20 # Use an appropriate version of Go
+      # Step 2: Install dependencies
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git wget build-essential
 
-      # Step 3: Set up environment variables
-      - name: Setup environment variables
-        run: echo "GOPATH=${{ runner.temp }}/go" >> $GITHUB_ENV
-        env:
-          PATH: ${{ runner.tool_cache }}/go/bin:$PATH
+      # Step 3: Clone and build spotifydownload
+      - name: Clone spotifydownload repository
+        run: |
+          git clone https://github.com/schollz/spotifydownload.git
+          cd spotifydownload
+          go build -o spotifydownload .
 
-      # Step 4: Install spotifydownload
-      - name: Install spotifydownload
-        run: go get github.com/schollz/spotifydownload@latest
-        env:
-          GOPATH: ${{ runner.temp }}/go
-          PATH: ${{ runner.tool_cache }}/go/bin:$PATH:${{ runner.temp }}/go/bin
+      # Step 4: Add spotifydownload to PATH
+      - name: Add to PATH
+        run: echo "${{ github.workspace }}/spotifydownload" >> $GITHUB_PATH
 
       # Step 5: Download Spotify playlist
       - name: Download playlist
         run: spotifydownload -playlist https://open.spotify.com/playlist/3dfaSDUbwFRu2IDx90SZte?si=mU60aGiZSBy15Ci6L1A2Zg
-        env:
-          PATH: ${{ runner.tool_cache }}/go/bin:$PATH:${{ runner.temp }}/go/bin
 
       # Step 6: List downloaded files
       - name: List downloaded files
