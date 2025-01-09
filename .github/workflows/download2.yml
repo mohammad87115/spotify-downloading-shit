@@ -1,29 +1,33 @@
-name: Download from spotify 2
+name: Download from Spotify 2
 
 on:
   # Manual trigger
   workflow_dispatch:
 
 jobs:
-  run-vless:
+  download:
     runs-on: ubuntu-latest
 
     steps:
-      # Step 1: Checkout the repository
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Setup golang and spotifydownload
-        run: curl https://getspotifydownload.schollz.com | bash
+      - name: Setup Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.20
+
+      - name: Install spotifydownload
+        run: go get github.com/schollz/spotifydownload
 
       - name: Download playlist
         run: spotifydownload -playlist https://open.spotify.com/playlist/3dfaSDUbwFRu2IDx90SZte?si=mU60aGiZSBy15Ci6L1A2Zg
-        
-      - name: Nothing special, just ls
+
+      - name: List downloaded files
         run: ls
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: Songs
-          path: ./*.mp3
+          path: "*"
