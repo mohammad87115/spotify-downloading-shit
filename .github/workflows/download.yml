@@ -1,0 +1,41 @@
+name: Download from spotify
+
+on:
+  # Manual trigger
+  workflow_dispatch:
+
+jobs:
+  run-vless:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.11"
+          
+      - name: Upgrading pip
+        run: python -m pip install --upgrade pip
+        
+      - name: Install SpotDL
+        run: pip install spotdl
+
+      - name: Downloading FFMPEG
+        run: spotdl --download-ffmpeg
+
+      - name: Downloading songs
+        run: spotdl https://open.spotify.com/playlist/3dfaSDUbwFRu2IDx90SZte?si=a5897f8be3dc4d37
+
+      - name: Nothing special, just ls
+        run: ls
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: Songs
+          path: ./*.mp3
