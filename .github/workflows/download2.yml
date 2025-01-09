@@ -5,33 +5,46 @@ on:
   workflow_dispatch:
 
 jobs:
-  download:
+  run-vless:
     runs-on: ubuntu-latest
 
     steps:
+      # Step 1: Checkout the repository
       - name: Checkout Repository
         uses: actions/checkout@v3
 
+      # Step 2: Setup Go environment
       - name: Setup Go
         uses: actions/setup-go@v4
         with:
-          go-version: 1.20
+          go-version: 1.20 # Use an appropriate version of Go
 
-      - name: Install spotifydownload
-        run: go get github.com/schollz/spotifydownload
+      # Step 3: Set up environment variables
+      - name: Setup environment variables
+        run: echo "GOPATH=${{ runner.temp }}/go" >> $GITHUB_ENV
         env:
           PATH: ${{ runner.tool_cache }}/go/bin:$PATH
-          
+
+      # Step 4: Install spotifydownload
+      - name: Install spotifydownload
+        run: go install github.com/schollz/spotifydownload@latest
+        env:
+          GOPATH: ${{ runner.temp }}/go
+          PATH: ${{ runner.tool_cache }}/go/bin:$PATH:${{ runner.temp }}/go/bin
+
+      # Step 5: Download Spotify playlist
       - name: Download playlist
         run: spotifydownload -playlist https://open.spotify.com/playlist/3dfaSDUbwFRu2IDx90SZte?si=mU60aGiZSBy15Ci6L1A2Zg
         env:
-          PATH: ${{ runner.tool_cache }}/go/bin:$PATH
+          PATH: ${{ runner.tool_cache }}/go/bin:$PATH:${{ runner.temp }}/go/bin
 
+      # Step 6: List downloaded files
       - name: List downloaded files
-        run: ls
+        run: ls -lh *.mp3
 
+      # Step 7: Upload MP3 files as artifacts
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: Songs
-          path: "*"
+          path: "*.mp3"
