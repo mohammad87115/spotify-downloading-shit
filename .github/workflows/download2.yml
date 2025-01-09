@@ -36,11 +36,11 @@ jobs:
 
       # Step 6: List downloaded files
       - name: List downloaded files
-        run: ls -lh *.mp3
+        run: ls
 
       # Step 7: Upload MP3 files as artifacts
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
           name: Songs
-          path: "*.mp3"
+          path: "*"
